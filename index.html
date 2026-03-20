@@ -112,7 +112,8 @@
           const reqRef = useRef(null);
           const timerRef = useRef(null);
           const dataArrayRef = useRef(new Uint8Array(0)); 
-          
+          const smoothDataRef = useRef(new Float32Array(1024));
+          const prevDataRef = useRef(new Float32Array(1024));
           const recStartTimeRef = useRef(0);
           const beatRef = useRef({ peak: 0, decay: 0, threshold: 0.5 });
           
@@ -336,30 +337,24 @@
               let kickImpulse = 0;
 
               if (analyserRef.current && !audioRef.current.paused) {
-                  analyserRef.current.getByteFrequencyData(dataArray);
-                  
-                  let bTotal = 0; 
-                  for(let b=0; b<4; b++) bTotal += dataArray[b]; 
-                  let rawBass = (bTotal / 4) / 255;
-                  
-                  if (rawBass > beatRef.current.threshold && rawBass > beatRef.current.peak) {
-                      beatRef.current.peak = rawBass;
-                      beatRef.current.threshold = rawBass * 0.9; 
-                  } else {
-                      beatRef.current.peak *= 0.85; 
-                      beatRef.current.threshold -= 0.02; 
-                      if (beatRef.current.threshold < 0.4) beatRef.current.threshold = 0.4;
-                  }
-                  kickImpulse = beatRef.current.peak * s.kick;
-              } else {
-                  isDemo = true; anim.current.demoPhase += 0.05; anim.current.angle += 0.01; anim.current.orbitRot += 0.005;
-                  kickImpulse = Math.max(0, Math.sin(anim.current.demoPhase)) * s.kick * 0.5;
-              }
-              
-              anim.current.orbitRot += 0.005;
+    analyserRef.current.getByteFrequencyData(dataArray);
 
-              const radius = (s.radius * globalScale) + (kickImpulse * 20); 
+    // 🔥 TAMBAHAN SMOOTHING (SPECTERR FEEL)
+    const smoothingUp = 0.35;
+    const smoothingDown = 0.08;
 
+    for (let i = 0; i < dataArray.length; i++) {
+        let current = dataArray[i];
+        let prev = smoothDataRef.current[i];
+
+        if (current > prev) {
+            smoothDataRef.current[i] += (current - prev) * smoothingUp;
+        } else {
+            smoothDataRef.current[i] += (current - prev) * smoothingDown;
+        }
+
+        prevDataRef.current[i] = prev;
+          }
               // --- LOGIKA MAPPING FREKUENSI (BASS TENGAH, TREBLE LUAR) ---
               // Fungsi untuk gaya melintang/garis lurus (Horizon, Waveform, dll)
               const getCenteredFreq = (index, totalBars) => {
