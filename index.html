@@ -611,11 +611,24 @@
                           break;
                       }
                       case 'SPECTRUM_AI': {
-                           const p=140; const sA=(Math.PI*2)/p; ctx.beginPath();
-                           for(let i=0; i<=p; i++) { const ang = i*sA - Math.PI/2; const val = getSmoothFreqp(i, p); const r = radius + (val/255)*200*mult; const x = Math.cos(ang)*r; const y = Math.sin(ang)*r; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
-                           ctx.closePath(); ctx.fillStyle='rgba(0,255,255,0.4)'; ctx.fill(); ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
-                           break;
-                      }
+   const p=140; const sA=(Math.PI*2)/p; ctx.beginPath();
+   for(let i=0; i<=p; i++) {
+       const ang = i*sA - Math.PI/2;
+       const val = getSmartFreq(i, p);
+       const r = radius + (val/255)*200*mult;
+       const x = Math.cos(ang)*r;
+       const y = Math.sin(ang)*r;
+       if(i===0) ctx.moveTo(x,y);
+       else ctx.lineTo(x,y);
+   }
+   ctx.closePath();
+   ctx.fillStyle='rgba(0,255,255,0.4)';
+   ctx.fill();
+   ctx.strokeStyle='white';
+   ctx.lineWidth=2;
+   ctx.stroke();
+   break;
+                                                   }
                       case 'HEXAGON': {
                           for(let l=0; l<3; l++) { ctx.save(); ctx.rotate(anim.current.hexRot * (l%2===0?1:-1)); ctx.beginPath(); for(let i=0; i<=6; i++) { const val = getSmartFreq(i * 10, 60); const r = radius + (l*30) + (val/255)*50*mult; const a = i * (Math.PI*2/6); ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r); } ctx.closePath(); ctx.strokeStyle = `hsl(${l*60}, 100%, 50%)`; ctx.lineWidth=4; ctx.stroke(); ctx.restore(); }
                           break;
