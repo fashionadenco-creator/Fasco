@@ -435,24 +435,7 @@
               const thick = s.thick * globalScale;
 
               try {
-                  const getSmoothFreq = (i, total) => {
-    const min = 1;
-    const max = 500;
-
-    const logMin = Math.log(min);
-    const logMax = Math.log(max);
-
-    const percent = i / total;
-    const logIndex = logMin + percent * (logMax - logMin);
-
-    const index = Math.floor(Math.exp(logIndex));
-
-    let val = smoothDataRef.current[index] || 0;
-    let prev = prevDataRef.current[index] || 0;
-
-    // efek delay + smooth
-    return val * 0.7 + prev * 0.3;
-};
+                  
                   switch (s.style) {
                       case 'PARTICLE_MASCOT': {
                           ctx.save(); ctx.translate(0, ~~(-60 * globalScale)); 
